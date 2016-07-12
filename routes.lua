@@ -15,17 +15,6 @@ heuristicFactors = {costPerLen = 1.2, assumption = 1.2, length = 1, cost = 1.2};
 
 routes = {};
 
--- Copy a route to a new table, preserving all data. Used to branch new paths.
-function routes.copy(routeobject)
-  local newobject = {};
-  for i=1, #routeobject do
-    local oldroute = routeobject[i];
-    local newroute = {{oldroute[1][1], oldroute[1][2], oldroute[1][3]}, {oldroute[2][1], oldroute[2][2]}, oldroute[3], oldroute[4]};
-    newobject[i] = newroute;
-  end
-
-  return newobject;
-end
 -- Add a route to an existing routeobject. Mainly used for initialising.
 function routes.add(routeobject, startX, startY, endX, endY)
   local newroute = { {startX - 1, startY, 0}, {endX, endY}, 0, 0};
@@ -119,6 +108,18 @@ end
 -- Return the total heuristic of the route R, or of all routes if R is nil.
 function routes.get_heuristic(routeobject, r, absolute)
   return routes.get_total_length(routeobject, r, absolute) * heuristicFactors.length + routes.get_total_cost(routeobject, r, absolute) * heuristicFactors.cost;
+end
+
+-- Copy a route to a new table, preserving all data. Used to branch new paths.
+function routes.copy(routeobject)
+  local newobject = {};
+  for i=1, #routeobject do
+    local oldroute = routeobject[i];
+    local newroute = {{oldroute[1][1], oldroute[1][2], oldroute[1][3]}, {oldroute[2][1], oldroute[2][2]}, oldroute[3], oldroute[4]};
+    newobject[i] = newroute;
+  end
+
+  return newobject;
 end
 
 function routes.new()
