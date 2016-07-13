@@ -16,6 +16,20 @@
 
 maps = {};
 
+function maps.get_size_params(map)
+  local maxX, maxY, minX, minY = -1000000000, -1000000000, 1000000000, 1000000000;
+  for x, v in pairs(map[2]) do
+    if(x > maxX) then maxX = x; end
+    if(x < minX) then minX = x; end
+    for y, b in pairs(v) do
+      if(y > maxY) then maxY = y; end
+      if(y < minY) then minY = y; end
+    end
+  end
+
+  return maxX, maxY, minX, minY;
+end
+
 
 -- Return the block at position pX pY, or nil if this block does not exist.
 -- This will always preference the map reference!! If a mapref block exists at that position, any block in the actual map gets ignored!
@@ -26,7 +40,7 @@ function maps.get_block(map, pX, pY)
   end
 
   if(map[2][pX] == nil) then return nil;
-  else return map[2][pX][pY][1], map[2][pX][pY][2]; end
+  else return map[2][pX][pY]; end
 end
 -- Set the block at position pX, pY.
 -- This completely ignores the map-ref, so don't be confused if a set block doesn't change anything - The mapref might have overridden it!

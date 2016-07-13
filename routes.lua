@@ -11,9 +11,8 @@ require "utils"
 ]]--
 
 -- The heuristic factor values for the pathfinding. Used as defaults to compute, well, the heuristic
-heuristicFactors = {costPerLen = 1.2, assumption = 1.2, length = 1, cost = 1.2};
 
-routes = {};
+routes = {heuristic = {costPerLen = 1.2, assumption = 1.2, length = 1, cost = 1.2};};
 
 -- Add a route to an existing routeobject. Mainly used for initialising.
 function routes.add(routeobject, startX, startY, endX, endY)
@@ -89,25 +88,25 @@ function routes.get_remaining_length(routeobject, r)
 end
 -- Return the expected remaining cost for route R, or all routes if R is nil
 function routes.get_remaining_cost(routeobject, r)
-  return routes.get_remaining_length(routeobject, r) * heuristicFactors.costPerLen;
+  return routes.get_remaining_length(routeobject, r) * routes.heuristic.costPerLen;
 end
 -- Return the total length, known and expected. Note: If "absolute" is set it will give the absolute minimum that can not be underscored, instead of a guestimated value.
 function routes.get_total_length(routeobject, r, absolute)
-  local assmFactor = heuristicFactors.assumption;
+  local assmFactor = routes.heuristic.assumption;
   if(absolute) then assmFactor = 1; end
 
   return routes.get_known_length(routeobject, r) + routes.get_remaining_length(routeobject, r) * assmFactor;
 end
 -- Return the total cost, known and expected. As above, if "absolute" is set it will return the absolute best value.
 function routes.get_total_cost(routeobject, r, absolute)
-  local assmFactor = heuristicFactors.assumption;
+  local assmFactor = routes.heuristic.assumption;
   if(absolute) then assmFactor = 1; end
 
   return routes.get_known_cost(routeobject, r) + routes.get_remaining_cost(routeobject, r) * assmFactor;
 end
 -- Return the total heuristic of the route R, or of all routes if R is nil.
 function routes.get_heuristic(routeobject, r, absolute)
-  return routes.get_total_length(routeobject, r, absolute) * heuristicFactors.length + routes.get_total_cost(routeobject, r, absolute) * heuristicFactors.cost;
+  return routes.get_total_length(routeobject, r, absolute) * routes.heuristic.length + routes.get_total_cost(routeobject, r, absolute) * routes.heuristic.cost;
 end
 
 -- Copy a route to a new table, preserving all data. Used to branch new paths.
