@@ -13,6 +13,8 @@ pieces = {};
 
 -- Fucking awesome function to check if it even makes sense to place something somewhere :3
 function pieces.is_viable(piece, pX, pY, type, rotation, length)
+  rotation = rotation % 4;
+
   -- If the block type to be set is nil, then it's always possible
   if(type == nil) then return true; end
   -- If the position where the block should be set down is already occupied ... Stupid idea
@@ -37,7 +39,7 @@ function pieces.is_viable(piece, pX, pY, type, rotation, length)
     -- Iterate through all pieces between the entrance and exit of the UBelt, and make sure that there's no other Ubelt interfering!
     for i = 1, length - 1 do
       local mapblock = maps.get_block(piece[2], pX + dX * i, pY + dY * i);
-      if(mapblock[1] == 3 and (mapblock[2] % 2) == (rotation % 2)) then return false; end
+      if(mapblock ~= nil and (mapblock[1] == 3 and (mapblock[2] % 2) == (rotation % 2))) then return false; end
     end
 
     return true;
@@ -63,6 +65,7 @@ function pieces.place_if_viable(piece, pX, pY, type, rotation, length)
 
   if(type == 3) then
     local dX, dY = utils.rotationOffset(rotation);
+    
     maps.set_block(piece[2], pX, pY, 3, rotation);
     maps.set_block(piece[2], pX + dX * length, pY + dY * length, 3, rotation);
     return true;

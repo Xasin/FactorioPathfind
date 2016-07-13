@@ -12,7 +12,7 @@ require "utils"
 
 -- The heuristic factor values for the pathfinding. Used as defaults to compute, well, the heuristic
 
-routes = {heuristic = {costPerLen = 1.2, assumption = 1.2, length = 1, cost = 1.2};};
+routes = {heuristic = {costPerLen = 1, assumption = 1.2, length = 1, cost = 1.2};};
 
 -- Add a route to an existing routeobject. Mainly used for initialising.
 function routes.add(routeobject, startX, startY, endX, endY)
