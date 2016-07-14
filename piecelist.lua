@@ -17,21 +17,11 @@ piecelists = {};
 
 -- Insert a piece into the piecelist
 -- However, before this happens, the piece will be checked for how good it compares to the current winner, if there is one!
--- If it is worse, it will simply be ignored, if it is however better, it will be set as new winner piece!
+-- If it is worse, it will be deleted.
 function piecelists.insert(plist, piece)
   if(plist.winnerHeuristic ~= nil
       and routes.get_heuristic(piece[1], nil, true) >= plist.winnerHeuristic) then
         return false;
-  end
-
-  if(routes.at_goal(piece[1], nil)) then
-    print("Found a winner!")
-
-    plist.winnerHeuristic = routes.get_heuristic(piece[1], nil, true);
-    plist.winner = piece;
-    plist.winnerTime = os.time();
-
-    return false;
   end
 
   local i = 0;
@@ -66,6 +56,24 @@ function piecelists.get_best(plist)
 
   return cBPiece;
 end
+-- Compare a piece against the current winner, and insert it as new, better winner
+function piecelists.update_winner(plist, winnerP)
+  if(plist.winnerHeuristic ~= nil
+      and routes.get_heuristic(winnerP[1], nil, true) >= plist.winnerHeuristic) then
+        return false;
+  end
+
+  if(routes.at_goal(winnerP[1], nil)) then
+
+    plist.winnerHeuristic = routes.get_heuristic(winnerP[1], nil, true);
+    plist.winner = winnerP;
+    plist.winnerTime = os.time();
+
+    return true;
+  end
+
+  return false;
+end
 
 -- Expand a piece's route "r" with normal conveyor belts
 function piecelists.expand_route_belts(plist, piece, r)
@@ -79,8 +87,9 @@ function piecelists.expand_route_belts(plist, piece, r)
     local newpiece = pieces.copy(piece);
 
     if(pieces.place_if_viable(newpiece, pX, pY, 2, i)) then
-      piecelists.insert(plist, newpiece);
       routes.append(newpiece[1], r, pX, pY, i, 1, 1);
+
+      piecelists.insert(plist, newpiece);
     end
   end
 end
@@ -96,16 +105,15 @@ function piecelists.expand_route_ubelts(plist, piece, r)
     local newpiece = pieces.copy(piece);
 
     if(pieces.place_if_viable(newpiece, pX, pY, 3, pR, i)) then
+      routes.append(newpiece[1], r, pX + dX * i, pY + dY * i, pR, i + 1, 8);
+
       piecelists.insert(plist, newpiece);
-      routes.append(newpiece[1], r, pX + dX * i, pY + dY * i, pR, i + 1, 7);
     end
   end
 end
 
 -- Expand a piece, meaning: Go through all possible next steps of conveyor belts, underground belts, etc. etc.
 function piecelists.expand(plist, piece)
-  piecelists.remove(plist, piece);
-
   for i = 1, #piece[1] do
     if(not routes.at_goal(piece[1], i)) then
       piecelists.expand_route_belts(plist, piece, i);
@@ -114,9 +122,15 @@ function piecelists.expand(plist, piece)
   end
 end
 
--- Just expand the current best piece. Best function to be used in an iterator.
+-- Just expand the current best piece. Best function to be used in an iterator. Also checks for a winner condition!
 function piecelists.expand_best(plist);
-  piecelists.expand(plist, piecelists.get_best(plist));
+  local bPiece = piecelists.get_best(plist);
+
+  if(not piecelists.update_winner(plist, bPiece)) then
+    piecelists.expand(plist, piecelists.get_best(plist));
+  end
+
+  piecelists.remove(plist, bPiece);
 end
 
 -- Return the current length of the piecelist

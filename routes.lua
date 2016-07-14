@@ -12,7 +12,7 @@ require "utils"
 
 -- The heuristic factor values for the pathfinding. Used as defaults to compute, well, the heuristic
 
-routes = {heuristic = {costPerLen = 1, assumption = 1.2, length = 1, cost = 1.2};};
+routes = {heuristic = {costPerLen = 1, assumption = 1.087, length = 1, cost = 1.1}};
 
 -- Add a route to an existing routeobject. Mainly used for initialising.
 function routes.add(routeobject, startX, startY, endX, endY)
@@ -83,7 +83,7 @@ function routes.get_remaining_length(routeobject, r)
     local cEnd = routeobject[r][2];
     local dX, dY = utils.rotationOffset(routeobject[r][1][3]);
 
-    return math.abs(cEnd[1] - cHead[1] - dX) + math.abs(cEnd[2] - cHead[2] - dY);
+    return math.abs(cEnd[1] - (cHead[1] + dX * 0.01)) + math.abs(cEnd[2] - (cHead[2] + dY * 0.01));
   end
 end
 -- Return the expected remaining cost for route R, or all routes if R is nil

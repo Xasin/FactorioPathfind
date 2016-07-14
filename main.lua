@@ -3,12 +3,12 @@ require "piecedraw"
 require "piecelist"
 
 tPiece = pieces.new();
-routes.add(tPiece[1], 1, 1, 10, 10);
+routes.add(tPiece[1], -50, -50, 50, 50);
 tList = piecelists.new(tPiece);
 
-while(tList.winner == nil) do
-  pieces.draw(piecelists.get_best(tList));
+while(not tList.winner) do
   piecelists.expand_best(tList);
-
-  os.execute("sleep 1");
 end
+
+
+pieces.draw(tList.winner);
